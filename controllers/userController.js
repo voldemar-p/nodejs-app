@@ -4,14 +4,18 @@ exports.login = function(req, res) {
     let user = new User(req.body);
     user.login().then(function(result) { // if promise is successful
         req.session.user = {username: user.data.username};
-        res.send(result);
+        req.session.save(function() {
+            res.redirect("/");
+        });
     }).catch(function(e) { // e -> error (if promise is unsuccessful)
         res.send(e);
     });
 };
 
-exports.logout = function() {
-    
+exports.logout = function(req, res) {
+    req.session.destroy(function() { // lõpeta sessioon
+        res.redirect("/"); // kui sessioon on lõpetatud, suuna tagasi kodulehele
+    });
 };
 
 exports.register = function(req, res) {

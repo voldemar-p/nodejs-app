@@ -8,6 +8,7 @@ let User = function(data) {
     this.errors = [];
 };
 
+// ----------------------------------------------- CLEAN INPUT --------------------------------------------------------------
 User.prototype.cleanUp = function() {
     if (typeof(this.data.username) != "string") {this.data.username = ""};
     if (typeof(this.data.email) != "string") {this.data.email = ""};
@@ -21,17 +22,33 @@ User.prototype.cleanUp = function() {
     };
 };
 
+// ----------------------------------------------- VALIDATE --------------------------------------------------------------
 User.prototype.validate = function() {
-    if  (this.data.username == "") {this.errors.push("You must provide a username")};
-    if  (this.data.username != "" && !validator.isAlphanumeric(this.data.username)) {this.errors.push("Username can only contain letters and numbers")};
-    if  (!validator.isEmail(this.data.email)) {this.errors.push("You must provide a valid email address")};
-    if  (this.data.password == "") {this.errors.push("You must provide a password")};
-    if  (this.data.password.length > 0 && this.data.password.length < 12) {this.errors.push("Password must be at least 12 characters")};
-    if  (this.data.password.length > 50) {this.errors.push("Password cannot exceed 50 characters")};
-    if  (this.data.username.length > 0 && this.data.username.length < 3) {this.errors.push("Username must be at least 3 characters")};
-    if  (this.data.username.length > 30) {this.errors.push("Username cannot exceed 30 characters")};
+    return new Promise(async (resolve, reject) => {
+        if  (this.data.username == "") {this.errors.push("You must provide a username")};
+        if  (this.data.username != "" && !validator.isAlphanumeric(this.data.username)) {this.errors.push("Username can only contain letters and numbers")};
+        if  (!validator.isEmail(this.data.email)) {this.errors.push("You must provide a valid email address")};
+        if  (this.data.password == "") {this.errors.push("You must provide a password")};
+        if  (this.data.password.length > 0 && this.data.password.length < 12) {this.errors.push("Password must be at least 12 characters")};
+        if  (this.data.password.length > 50) {this.errors.push("Password cannot exceed 50 characters")};
+        if  (this.data.username.length > 0 && this.data.username.length < 3) {this.errors.push("Username must be at least 3 characters")};
+        if  (this.data.username.length > 30) {this.errors.push("Username cannot exceed 30 characters")};
+    
+        // only if username is vaid, check if it is already taken
+        if (this.data.username.length > 2 && this.data.username.length < 31 && validator.isAlphanumeric(this.data.username)) {
+            let usernameExists = await userCollection.findOne({username: this.data.username}) // wait until function has finished
+            if (usernameExists) {this.errors.push("That username is already taken")}
+        }
+        // only if email is vaid, check if it is already taken
+        if (validator.isEmail(this.data.email)) {
+            let emailExists = await userCollection.findOne({email: this.data.email})
+            if (emailExists) {this.errors.push("That email is already being used")}
+        }
+        resolve();
+    });
 };
 
+// ----------------------------------------------- LOGIN --------------------------------------------------------------
 User.prototype.login = function() {
     return new Promise((resolve, reject) => {
         this.cleanUp();
@@ -48,18 +65,24 @@ User.prototype.login = function() {
     });
 };
 
+// ----------------------------------------------- REGISTER --------------------------------------------------------------
 User.prototype.register = function() {
-    // 1. validate user data
-    this.cleanUp();
-    this.validate();
-
-    // 2. only if no validation errors -> save user data to a database
-    if (!this.errors.length) {
-        // hash user password
-        let salt = bcrypt.genSaltSync(10);
-        this.data.password = bcrypt.hashSync(this.data.password, salt);
-        userCollection.insertOne(this.data);
-    }
+    return new Promise(async (resolve, reject) => {
+        // 1. validate user data
+        this.cleanUp();
+        await this.validate();
+    
+        // 2. only if no validation errors -> save user data to a database
+        if (!this.errors.length) {
+            // hash user password
+            let salt = bcrypt.genSaltSync(10);
+            this.data.password = bcrypt.hashSync(this.data.password, salt);
+            await userCollection.insertOne(this.data);
+            resolve();
+        } else {
+            reject(this.errors);
+        }
+    });
 };
 
 module.exports = User;

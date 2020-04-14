@@ -1,5 +1,6 @@
 const User = require("../models/User");
 
+// ----------------------------------------------- LOGIN --------------------------------------------------------------
 exports.login = function(req, res) {
     let user = new User(req.body);
     user.login().then(function(result) { // if promise is successful
@@ -15,26 +16,38 @@ exports.login = function(req, res) {
     });
 };
 
+// ----------------------------------------------- LOGOUT --------------------------------------------------------------
 exports.logout = function(req, res) {
     req.session.destroy(function() { // lõpeta sessioon
         res.redirect("/"); // kui sessioon on lõpetatud, suuna tagasi kodulehele
     });
 };
 
+// ----------------------------------------------- REGISTER --------------------------------------------------------------
 exports.register = function(req, res) {
     let user = new User(req.body);
-    user.register();
-    if (user.errors.length) {
-        res.send(user.errors);
-    } else {
-        res.send("Congrats, no errors");
-    }
+    user.register().then(() => {
+        req.session.user = {username: user.data.username};
+        req.session.save(function() {
+            res.redirect("/");
+        });
+    }).catch((regErrors) => {
+        regErrors.forEach(function(error) {
+            req.flash("regErrors", error); // array and an item you want to push into an array
+        });
+        req.session.save(function() {
+            res.redirect("/");
+        });
+    });
 };
 
+// ----------------------------------------------- HOME PAGE --------------------------------------------------------------
 exports.home = function(req, res) {
     if (req.session.user) {
-        res.render("home-dashboard", {username: req.session.user.username}); // muudab kasutajanime antud ejs failile dünaamiliselt kättesaaadavaks
+        res.render("home-dashboard", {username: req.session.user.username});
+        // muudab kasutajanime antud ejs failile dünaamiliselt kättesaaadavaks
     } else {
-        res.render("home-guest", {errors: req.flash("errors")}); // ejs method for template rendering + flash package adding extra message
+        res.render("home-guest", {errors: req.flash("errors"), regErrors: req.flash("regErrors")});
+        // ejs method for template rendering + flash package adding extra message
     }
 };

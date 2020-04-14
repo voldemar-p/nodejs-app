@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const userCollection = require("../db").db().collection("users");
 
 const validator = require("validator"); // checking if the email is valid
+const md5 = require("md5"); // md5 - for hashing gravatar
 
 let User = function(data) {
     this.data = data;
@@ -55,6 +56,8 @@ User.prototype.login = function() {
         userCollection.findOne({username: this.data.username}).then((attemptedUser) => {
             if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
                 // bcrypt hashib loginisse sisestatud salasõna ning võrdleb seda andmebaasis oleva hashitud salasõnaga
+                this.data = attemptedUser;
+                this.getAvatar();
                 resolve("congrats"); // successful promise
             } else {
                 reject("invalid input"); // unsuccessful promise
@@ -78,11 +81,16 @@ User.prototype.register = function() {
             let salt = bcrypt.genSaltSync(10);
             this.data.password = bcrypt.hashSync(this.data.password, salt);
             await userCollection.insertOne(this.data);
+            this.getAvatar();
             resolve();
         } else {
             reject(this.errors);
         }
     });
 };
+
+User.prototype.getAvatar = function() {
+    this.avatar = `https://gravatar.com/avatar/${md5(this.data.email)}?s=128`;
+}
 
 module.exports = User;

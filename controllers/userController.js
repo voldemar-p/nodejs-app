@@ -8,7 +8,10 @@ exports.login = function(req, res) {
             res.redirect("/");
         });
     }).catch(function(e) { // e -> error (if promise is unsuccessful)
-        res.send(e);
+        req.flash("errors", e); // req.session.flash.errors = [e]
+        req.session.save(function() {
+            res.redirect("/");
+        });
     });
 };
 
@@ -32,6 +35,6 @@ exports.home = function(req, res) {
     if (req.session.user) {
         res.render("home-dashboard", {username: req.session.user.username}); // muudab kasutajanime antud ejs failile dünaamiliselt kättesaaadavaks
     } else {
-        res.render("home-guest"); // ejs method for template rendering
+        res.render("home-guest", {errors: req.flash("errors")}); // ejs method for template rendering + flash package adding extra message
     }
 };

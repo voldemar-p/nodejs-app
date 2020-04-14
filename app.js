@@ -1,9 +1,10 @@
 const express = require("express");
 const session = require("express-session");
+const flash = require("connect-flash");
 const MongoStore = require("connect-mongo")(session);
 const app = express();
 
-let sessionOptions = session({
+let sessionOptions = session({ // use session to let users login-logout
     secret: "There are no secrets",
     store: new MongoStore({client: require("./db")}),
     resave: false,
@@ -12,6 +13,7 @@ let sessionOptions = session({
 });
 
 app.use(sessionOptions); // use the sessionOptions in our app
+app.use(flash());
 
 const router = require("./router"); // tagastab router.js faili sisu
 

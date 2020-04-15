@@ -4,9 +4,11 @@ const userCollection = require("../db").db().collection("users");
 const validator = require("validator"); // checking if the email is valid
 const md5 = require("md5"); // md5 - for hashing gravatar
 
-let User = function(data) {
+let User = function(data, getAvatar) { // lisa kasutaja gravatar
     this.data = data;
     this.errors = [];
+    if (getAvatar == undefined) {getAvatar = false};
+    if (getAvatar) {this.getAvatar()};
 };
 
 // ----------------------------------------------- CLEAN INPUT --------------------------------------------------------------

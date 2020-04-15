@@ -1,6 +1,4 @@
-const postsCollection = require("../db").db().collection("posts");
-// muutuja postsCollection = mongodb andmebaasi kollektsioon "posts"
-
+const postsCollection = require("../db").db().collection("posts"); // muutuja postsCollection = mongodb andmebaasi kollektsioon "posts"
 const ObjectID = require("mongodb").ObjectID; // mongodb viis kasutajanime salvestamiseks objektina
 
 let Post = function(data, userid) {
@@ -43,6 +41,22 @@ Post.prototype.create = function() {
             });
         } else {
             reject(this.errors);
+        }
+    });
+};
+
+// ----------------------------------------------- FIND POST BY ID --------------------------------------------------------------
+Post.findSingleById = function(id) {
+    return new Promise(async function(resolve, reject) {
+        if (typeof(id) != "string" || !ObjectID.isValid(id)) {
+            reject();
+            return
+        }
+        let post = await postsCollection.findOne({_id: new ObjectID(id)});
+        if (post) {
+            resolve(post);
+        } else {
+            reject();
         }
     });
 };

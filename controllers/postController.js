@@ -1,6 +1,6 @@
 const Post = require("../models/Post");
 
-// ----------------------------------------------- POST PAGE --------------------------------------------------------------
+// ----------------------------------------------- CREATE POST PAGE --------------------------------------------------------------
 exports.viewCreateScreen = function(req, res) {
     res.render("create-post");
 };
@@ -13,4 +13,14 @@ exports.create = function(req, res) {
     }).catch(function(errors) {
         res.send(errors);
     });
+};
+
+// ----------------------------------------------- VIEW POST PAGE --------------------------------------------------------------
+exports.viewSingle = async function(req, res) {
+    try {
+        let post = await Post.findSingleById(req.params.id); // urli post id leidmiseks
+        res.render("single-post-screen", {post: post});
+    } catch {
+        res.send("404 template here");
+    }
 };

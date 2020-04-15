@@ -11,5 +11,6 @@ router.post("/logout", userController.logout);
 // POST ROUTES
 router.get("/create-post", userController.mustBeLoggedIn, postController.viewCreateScreen);
 router.post("/create-post", userController.mustBeLoggedIn, postController.create);
+router.get("/post/:id", postController.viewSingle); // id on konkreetne postitus, mida kasutaja soovib kuvada
 
 module.exports = router; // muuda const router teistele failidele kättesaadavaks

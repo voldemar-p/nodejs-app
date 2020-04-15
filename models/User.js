@@ -14,8 +14,7 @@ User.prototype.cleanUp = function() {
     if (typeof(this.data.username) != "string") {this.data.username = ""};
     if (typeof(this.data.email) != "string") {this.data.email = ""};
     if (typeof(this.data.password) != "string") {this.data.password = ""};
-
-    // taga, et kasutaja edastaks vaid küsitud väärtused
+    // TAGA, ET KASUTAJA OLEKS SISESTANUD VAID KAKTSEPTEERITAVAD VÄÄRTUSED
     this.data = {
         username: this.data.username.trim().toLowerCase(), // trim eemaldab tühikud
         email: this.data.email.trim().toLowerCase(),

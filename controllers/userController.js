@@ -1,5 +1,7 @@
 const User = require("../models/User");
 
+
+// ---------------------------------------- CHECK IF USER IS LOGGED IN -------------------------------------------------
 exports.mustBeLoggedIn = function(req, res, next) {
     if (req.session.user) {
         next();
@@ -15,7 +17,7 @@ exports.mustBeLoggedIn = function(req, res, next) {
 exports.login = function(req, res) {
     let user = new User(req.body);
     user.login().then(function(result) { // if promise is successful
-        req.session.user = {avatar: user.avatar, username: user.data.username};
+        req.session.user = {avatar: user.avatar, username: user.data.username, _id: user.data._id};
         req.session.save(function() {
             res.redirect("/");
         });
@@ -38,7 +40,7 @@ exports.logout = function(req, res) {
 exports.register = function(req, res) {
     let user = new User(req.body);
     user.register().then(() => {
-        req.session.user = {avatar: user.avatar, username: user.data.username};
+        req.session.user = {avatar: user.avatar, username: user.data.username, _id: user.data._id};
         req.session.save(function() {
             res.redirect("/");
         });
@@ -56,9 +58,9 @@ exports.register = function(req, res) {
 exports.home = function(req, res) {
     if (req.session.user) {
         res.render("home-dashboard");
-        // muudab kasutajanime antud ejs failile dünaamiliselt kättesaaadavaks
+        // renderdab kodulehe ejs failist
     } else {
         res.render("home-guest", {errors: req.flash("errors"), regErrors: req.flash("regErrors")});
-        // ejs method for template rendering + flash package adding extra message
+        // adding a flash package (extra dynamic messages integrated into a home page)
     }
 };

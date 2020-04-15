@@ -15,6 +15,11 @@ let sessionOptions = session({ // use session to let users login-logout
 app.use(sessionOptions); // use the sessionOptions in our app
 app.use(flash());
 
+app.use(function(req, res, next) {
+    res.locals.user = req.session.user; // teeb kasutaja info kõigile ejs templatitele kättesaadavaks.
+    next();
+});
+
 const router = require("./router"); // tagastab router.js faili sisu
 
 app.use(express.urlencoded({extended: false}));

@@ -19,7 +19,7 @@ app.use(flash());
 
 app.use(function(req, res, next) {
     res.locals.filterUserHTML = function(content) {
-        return sanitizeHTML(markdown, {allowedTags: ["p", "br", "ul", "ol", "li", "strong", "bold", "i", "em", "h1", "h2", "h3", "h4", "h5", "h6"], allowedAttributes: []});
+        return sanitizeHTML(markdown(content), {allowedTags: ["p", "br", "ul", "ol", "li", "strong", "bold", "i", "em", "h1", "h2", "h3", "h4", "h5", "h6"], allowedAttributes: []});
     }
     res.locals.errors = req.flash("errors");
     res.locals.success = req.flash("success");

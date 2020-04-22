@@ -1,8 +1,10 @@
 const express = require("express");
 const session = require("express-session");
 const flash = require("connect-flash");
+const markdown = require("marked");
 const MongoStore = require("connect-mongo")(session);
 const app = express();
+const sanitizeHTML = require("sanitize-html");
 
 let sessionOptions = session({ // use session to let users login-logout
     secret: "There are no secrets",
@@ -16,6 +18,9 @@ app.use(sessionOptions); // use the sessionOptions in our app
 app.use(flash());
 
 app.use(function(req, res, next) {
+    res.locals.filterUserHTML = function(content) {
+        return sanitizeHTML(markdown, {allowedTags: ["p", "br", "ul", "ol", "li", "strong", "bold", "i", "em", "h1", "h2", "h3", "h4", "h5", "h6"], allowedAttributes: []});
+    }
     res.locals.errors = req.flash("errors");
     res.locals.success = req.flash("success");
     if (req.session.user) {  // näitab, kas kasutaja on sisse logitud või ei.

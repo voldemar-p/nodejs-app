@@ -1,6 +1,7 @@
 const postsCollection = require("../db").db().collection("posts"); // muutuja postsCollection = mongodb andmebaasi kollektsioon "posts"
 const ObjectID = require("mongodb").ObjectID; // mongodb viis kasutajanime salvestamiseks objektina
 const User = require("./User");
+const sanitizeHTML = require("sanitize-html");
 
 let Post = function(data, userid, requestedPostId) {
     this.data = data;
@@ -15,8 +16,8 @@ Post.prototype.cleanUp = function() {
     if (typeof(this.data.body) != "string") {this.data.body = ""};
     // TAGA, ET KASUTAJA OLEKS SISESTANUD VAID KAKTSEPTEERITAVAD VÄÄRTUSED
     this.data = {
-        title: this.data.title.trim(),
-        body: this.data.body.trim(),
+        title: sanitizeHTML(this.data.title.trim(), {allowedTags: [], allowedAttributes: {}}), // allowed tags: 0, attributes: 0
+        body: sanitizeHTML(this.data.body.trim(), {allowedTags: [], allowedAttributes: {}}),
         createdDate: new Date(),
         author: ObjectID(this.userid)
     };
@@ -35,8 +36,8 @@ Post.prototype.create = function() {
         this.validate();
         if (!this.errors.lentgh) {
             // if there are no errors, save post into mongodb database
-            postsCollection.insertOne(this.data).then(() => {
-                resolve();
+            postsCollection.insertOne(this.data).then((info) => {
+                resolve(info.ops[0]._id);
             }).catch(() => {
                 this.errors.push("Please try again later");
                 reject(this.errors); // väljasta error

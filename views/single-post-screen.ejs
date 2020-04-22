@@ -22,7 +22,7 @@
       <!-- .getMonth() järel on + 1, kuna javascriptis hakatakse kuid loendama alates nullist, seega liites igale kuu väärtusele +1, saame õige numbri -->
 
     <div class="body-content">
-      <%= post.body %>
+      <%- filterUserHTML(post.body) %>
     </div>
 
   </div>

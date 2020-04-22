@@ -61,11 +61,12 @@ exports.home = function(req, res) {
         res.render("home-dashboard");
         // renderdab kodulehe ejs failist
     } else {
-        res.render("home-guest", {errors: req.flash("errors"), regErrors: req.flash("regErrors")});
+        res.render("home-guest", {regErrors: req.flash("regErrors")});
         // adding a flash package (extra dynamic messages integrated into a home page)
     }
 };
 
+// ----------------------------------------------- CHECK IF USER EXISTS --------------------------------------------------------------
 exports.ifUserExists = function(req, res, next) {
     User.findByUsername(req.params.username).then(function(userDocument) {
         req.profileUser = userDocument;
@@ -75,6 +76,7 @@ exports.ifUserExists = function(req, res, next) {
     });
 };
 
+// ----------------------------------------------- SHOW USER POSTS --------------------------------------------------------------
 exports.profilePostsScreen = function(req, res) {
     // ask our post model for posts with a certain author id
     Post.findByAuthorId(req.profileUser._id).then(function(posts) {

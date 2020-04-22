@@ -16,6 +16,13 @@ app.use(sessionOptions); // use the sessionOptions in our app
 app.use(flash());
 
 app.use(function(req, res, next) {
+    res.locals.errors = req.flash("errors");
+    res.locals.success = req.flash("success");
+    if (req.session.user) {  // näitab, kas kasutaja on sisse logitud või ei.
+        req.visitorId = req.session.user._id
+    } else {
+        req.visitorId = 0;
+    }
     res.locals.user = req.session.user; // teeb kasutaja info kõigile ejs templatitele kättesaadavaks.
     next();
 });

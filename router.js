@@ -17,5 +17,6 @@ router.get("/post/:id", postController.viewSingle); // id on konkreetne postitus
 router.get("/post/:id/edit", userController.mustBeLoggedIn, postController.viewEditScreen);
 router.post("/post/:id/edit", userController.mustBeLoggedIn, postController.edit);
 router.post("/post/:id/delete", userController.mustBeLoggedIn, postController.delete);
+router.post("/search/", postController.search);
 
 module.exports = router; // muuda const router teistele failidele kättesaadavaks

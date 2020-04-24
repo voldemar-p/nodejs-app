@@ -10,7 +10,7 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 router.post("/logout", userController.logout);
 // PROFILE ROUTES
-router.get("/profile/:username", userController.ifUserExists, userController.profilePostsScreen);
+router.get("/profile/:username", userController.ifUserExists, userController.sharedProfileData, userController.profilePostsScreen);
 // POST ROUTES
 router.get("/create-post", userController.mustBeLoggedIn, postController.viewCreateScreen);
 router.post("/create-post", userController.mustBeLoggedIn, postController.create);
@@ -21,5 +21,6 @@ router.post("/post/:id/delete", userController.mustBeLoggedIn, postController.de
 router.post("/search/", postController.search);
 // FOLLOW ROUTES
 router.post("/addFollow/:username", userController.mustBeLoggedIn, followController.addFollow);
+router.post("/removeFollow/:username", userController.mustBeLoggedIn, followController.removeFollow);
 
 module.exports = router; // muuda const router teistele failidele kättesaadavaks

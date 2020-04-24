@@ -1,4 +1,5 @@
 const postsCollection = require("../db").db().collection("posts"); // muutuja postsCollection = mongodb andmebaasi kollektsioon "posts"
+const followsCollection = require("../db").db().collection("follows");
 const ObjectID = require("mongodb").ObjectID; // mongodb viis kasutajanime salvestamiseks objektina
 const User = require("./User");
 const sanitizeHTML = require("sanitize-html");
@@ -167,11 +168,26 @@ Post.search = function(searchTerm) {
     });
 };
 
+// ----------------------------------------------- COUNT POSTS BY AUTHOR --------------------------------------------------------------
 Post.countPostsByAuthor = function(id) {
     return new Promise(async (resolve, reject) => {
         let postCount = await postsCollection.countDocuments({author: id});
         resolve(postCount);
     });
+};
+
+// ----------------------------------------------- GET USER FEED --------------------------------------------------------------
+Post.getFeed = async function(id) {
+    // create an array of user id-s that the current user follows
+    let followedUsers = await followsCollection.find({authorId: new ObjectID(id)}).toArray();
+    followedUsers = followedUsers.map(function(followDoc) {
+        return followDoc.followedId;
+    });
+    // look for posts where author is in the above array of followed users
+    return Post.reusablePostQuery([
+        {$match: {author: {$in: followedUsers}}},
+        {$sort: {createdDate: -1}} // uued postitused on kõige ees
+    ]);
 };
 
 module.exports = Post;

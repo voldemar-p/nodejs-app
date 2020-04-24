@@ -77,13 +77,13 @@ exports.register = function(req, res) {
 };
 
 // ----------------------------------------------- HOME PAGE --------------------------------------------------------------
-exports.home = function(req, res) {
+exports.home = async function(req, res) {
     if (req.session.user) {
-        res.render("home-dashboard");
-        // renderdab kodulehe ejs failist
+        // fetch posts feed of current user
+        let posts = await Post.getFeed(req.session.user._id);
+        res.render("home-dashboard", {posts: posts}); // renderdab kodulehe ejs failist
     } else {
-        res.render("home-guest", {regErrors: req.flash("regErrors")});
-        // adding a flash package (extra dynamic messages integrated into a home page)
+        res.render("home-guest", {regErrors: req.flash("regErrors")}); // adding a flash package (extra dynamic messages integrated into a home page)
     }
 };
 

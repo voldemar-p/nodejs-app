@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router(); // routeri seadistamine expressis
 const userController = require("./controllers/userController");
 const postController = require("./controllers/postController");
+const followController = require("./controllers/followController");
 
 // USER ROUTES
 router.get("/", userController.home);
@@ -18,5 +19,7 @@ router.get("/post/:id/edit", userController.mustBeLoggedIn, postController.viewE
 router.post("/post/:id/edit", userController.mustBeLoggedIn, postController.edit);
 router.post("/post/:id/delete", userController.mustBeLoggedIn, postController.delete);
 router.post("/search/", postController.search);
+// FOLLOW ROUTES
+router.post("/addFollow/:username", userController.mustBeLoggedIn, followController.addFollow);
 
 module.exports = router; // muuda const router teistele failidele kättesaadavaks

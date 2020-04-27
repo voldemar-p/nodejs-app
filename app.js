@@ -56,8 +56,8 @@ io.on("connection", function(socket) { // use socket.io to broadcast messages th
         let user = socket.request.session.user;
         socket.emit("welcome", {username: user.username, avatar: user.avatar});
         socket.on("chatMessageFromBrowser", function(data) {
-            socket.broadcast.emit("chatMessageFromServer", {message: data.message, username: user.username, avatar: user.avatar});
-            // what data to appear in browser (message, username and avatar)
+            socket.broadcast.emit("chatMessageFromServer", {message: sanitizeHTML(data.message, {allowedTags: [], allowedAttributes: {}}), username: user.username, avatar: user.avatar});
+            // which data is to appear in browser (message, username and avatar)
         });
     };
 });

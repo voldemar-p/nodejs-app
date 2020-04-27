@@ -90,10 +90,12 @@ User.prototype.register = function() {
     });
 };
 
+// ----------------------------------------------- GET AVATAR --------------------------------------------------------------
 User.prototype.getAvatar = function() {
     this.avatar = `https://gravatar.com/avatar/${md5(this.data.email)}?s=128`;
 };
 
+// ----------------------------------------------- FIND BY USERNAME --------------------------------------------------------------
 User.findByUsername = function(username) {
     return new Promise(function(resolve, reject) {
         if (typeof(username) != "string") {
@@ -117,5 +119,21 @@ User.findByUsername = function(username) {
         });
     })
 };
+
+// ----------------------------------------------- CHECK IF EMAIL ALREADY EXISTS --------------------------------------------------------------
+User.doesEmailExist = function(email) {
+    return new Promise(async function(resolve, reject) {
+        if (typeof(email) != "string") {
+            resolve(false);
+            return;
+        }
+        let user = await userCollection.findOne({email: email});
+        if (user) {
+            resolve(true);
+        } else {
+            resolve(false);
+        }
+    });
+}; 
 
 module.exports = User;

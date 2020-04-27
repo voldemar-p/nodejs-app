@@ -47,10 +47,19 @@ app.use("/", router);
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
-io.on("connection", function(socket) {
-    socket.on("chatMessageFromBrowser", function(data) {
-        io.emit("chatMessageFromServer", {message: data.message});
-    });
+io.use(function(socket, next) {
+    sessionOptions(socket.request, socket.request.res, next);
+});
+
+io.on("connection", function(socket) { // use socket.io to broadcast messages through server
+    if (socket.request.session.user) {
+        let user = socket.request.session.user;
+        socket.emit("welcome", {username: user.username, avatar: user.avatar});
+        socket.on("chatMessageFromBrowser", function(data) {
+            socket.broadcast.emit("chatMessageFromServer", {message: data.message, username: user.username, avatar: user.avatar});
+            // what data to appear in browser (message, username and avatar)
+        });
+    };
 });
 
 module.exports = server;

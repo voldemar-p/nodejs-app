@@ -3,6 +3,17 @@ const Post = require("../models/Post");
 const Follow = require("../models/Follow");
 const jwt = require("jsonwebtoken");
 
+// ---------------------------------------- GET USER POSTS THROUGH API -------------------------------------------------
+exports.apiGetPostsByUsername = async function(req, res) {
+    try {
+        let AuthorDoc = await User.findByUsername(req.params.username);
+        let posts = await Post.findByAuthorId(AuthorDoc._id);
+        res.json(posts);
+    } catch {
+        res.json("Sorry, invalid user requested.");
+    }
+};
+
 // ---------------------------------------- CHECK IF API USER IS LOGGED IN -------------------------------------------------
 exports.apiMustBeLoggedIn = function(req, res, next) {
     try {

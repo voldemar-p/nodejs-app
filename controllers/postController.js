@@ -52,7 +52,7 @@ exports.viewEditScreen = async function(req, res) {
     }
   };
 
-// ----------------------------------------------- EDIT THE POST --------------------------------------------------------------
+// ----------------------------------------------- EDIT POST --------------------------------------------------------------
 exports.edit = function(req, res) {
     let post = new Post(req.body, req.visitorId, req.params.id);
     post.update().then((status) => {
@@ -82,7 +82,7 @@ exports.edit = function(req, res) {
     });
 };
 
-// ----------------------------------------------- DELETE THE POST --------------------------------------------------------------
+// ----------------------------------------------- DELETE POST --------------------------------------------------------------
 exports.delete = function(req, res) {
     Post.delete(req.params.id, req.visitorId).then(() => {
         req.flash("success", "Post successfully deleted.");
@@ -90,6 +90,15 @@ exports.delete = function(req, res) {
     }).catch(() => {
         req.flash("errors", "You do not have permission to perform that action.");
         req.session.save(() => res.redirect("/"));
+    });
+};
+
+// ----------------------------------------------- API DELETE POST --------------------------------------------------------------
+exports.apiDelete = function(req, res) {
+    Post.delete(req.params.id, req.apiUser._id).then(() => {
+        res.json("Success");
+    }).catch(() => {
+        res.json("You do not have permission to perform that action.");
     });
 };
 

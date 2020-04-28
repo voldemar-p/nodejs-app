@@ -3,6 +3,7 @@ import axios from "axios";
 export default class RegistrationForm {
 
     constructor() {
+        this._csrf = document.querySelector("[name='_csrf']").value; // storing csrf value
         this.form = document.querySelector("#registration-form");
         this.allFields = document.querySelectorAll("#registration-form .form-control"); // tagastab mitmetest elementidest koosneva array
         this.insertValidationElements();
@@ -108,7 +109,7 @@ export default class RegistrationForm {
             this.showValidationError(this.email, "You must provide a valid email address.");
         };
         if (!this.email.errors) {
-            axios.post("/doesEmailExist", {email: this.email.value}).then((response) => { // kontrolli, kas email on juba kasutusel
+            axios.post("/doesEmailExist", {_csrf: this._csrf, email: this.email.value}).then((response) => { // kontrolli, kas email on juba kasutusel
                 if (response.data) {
                     this.email.isUnique = false;
                     this.showValidationError(this.email, "That email is already being used");
@@ -149,7 +150,7 @@ export default class RegistrationForm {
             this.showValidationError(this.username, "Username must be at least 3 characters.");
         };
         if (!this.username.errors) {
-            axios.post("/doesUsernameExist", {username: this.username.value}).then((response) => { // kontrolli, kas kasutajanimi on juba võetud
+            axios.post("/doesUsernameExist", {_csrf: this._csrf, username: this.username.value}).then((response) => { // kontrolli, kas kasutajanimi on juba võetud
                 if (response.data) {
                     this.showValidationError(this.username, "That username is already taken.");
                     this.username.isUnique = false;

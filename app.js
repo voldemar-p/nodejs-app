@@ -7,6 +7,11 @@ const csrf = require("csurf");
 const app = express();
 const sanitizeHTML = require("sanitize-html");
 
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
+
+app.use("/api", require("./router-api")); // API
+
 let sessionOptions = session({ // use session to let users login-logout
     secret: "There are no secrets",
     store: new MongoStore({client: require("./db")}),
@@ -34,9 +39,6 @@ app.use(function(req, res, next) {
 });
 
 const router = require("./router"); // tagastab router.js faili sisu
-
-app.use(express.urlencoded({extended: false}));
-app.use(express.json());
 
 app.use(express.static("public"));
 
